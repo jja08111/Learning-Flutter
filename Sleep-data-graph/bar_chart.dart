@@ -10,8 +10,8 @@ class OffsetRange {
   OffsetRange(this.dx, this.top, this.bottom);
 }
 
-class BarChart extends CustomPainter {
-  static const Color fontColor=Colors.white54;
+class SleepDataChart extends CustomPainter {
+  static const Color fontColor=Colors.white;
 
   Color color;
   double textScaleFactorXAxis = 1.0; // x축 텍스트의 비율을 정함.
@@ -23,7 +23,7 @@ class BarChart extends CustomPainter {
   double bottomPadding = 0.0;
   double leftPadding = 0.0;
 
-  BarChart({
+  SleepDataChart({
     this.dataWakeUpTime,
     this.dataAmount,
     this.labels,
@@ -75,10 +75,10 @@ class BarChart extends CustomPainter {
     for (int index = 0; index < labels.length; index++) {
       TextSpan span = TextSpan(
         style: TextStyle(
-        color: fontColor,
-        fontSize: fontSize,
-        fontFamily: 'Roboto',
-        fontWeight: FontWeight.w400),
+            color: fontColor,
+            fontSize: fontSize,
+            fontFamily: 'Roboto',
+            fontWeight: FontWeight.w400),
         text: labels[index],
       );
 
@@ -142,7 +142,7 @@ class BarChart extends CustomPainter {
     }
     bottomY = size.height - bottomPadding;
 
-    int topTime=_getClockDiff(dataWakeUpTime[indexOfMax],dataAmount[indexOfMax]).toInt(); // - (_topBarIsDotClock(indexOfMax) ? 2 : 3);
+    int topTime=_getClockDiff(dataWakeUpTime[indexOfMax],dataAmount[indexOfMax]).toInt(); 
     int bottomTime=dataWakeUpTime[indexOfMin].toInt() + (_lowestBarIsDotClock(indexOfMin) ? 0 : 1);
 
     double fontSize = 16;// calculateFontSize(maxValue, size, xAxis: false);
@@ -223,10 +223,10 @@ class BarChart extends CustomPainter {
 
     TextSpan span = TextSpan(
       style: TextStyle(
-      fontSize: fontSize,
-      color: fontColor,
-      fontFamily: 'Roboto',
-      fontWeight: FontWeight.w400),
+          fontSize: fontSize,
+          color: fontColor,
+          fontFamily: 'Roboto',
+          fontWeight: FontWeight.w400),
       text: text,
     );
 
@@ -274,7 +274,7 @@ class BarChart extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(BarChart old) {
+  bool shouldRepaint(SleepDataChart old) {
     return old.dataWakeUpTime != dataWakeUpTime;
   }
 }
