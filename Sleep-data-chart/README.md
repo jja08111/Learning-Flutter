@@ -5,7 +5,7 @@ This is chart that show sleep data per day.
 
 [이곳](https://software-creator.tistory.com/23)에서 bar chart코드를 이용하여 제작했습니다. 
 
-`barColor`, `fontColor`를 커스텀 할 수 있습니다.
+`barColor`, `fontColor`를 커스텀 할 수 있습니다.  
 You can customize the `barColor`, `fontColor`.
 
 # Sample 
