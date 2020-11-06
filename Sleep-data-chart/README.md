@@ -5,6 +5,9 @@ This is chart that show sleep data per day.
 
 [이곳](https://software-creator.tistory.com/23)에서 bar chart코드를 이용하여 제작했습니다. 
 
+`barColor`, `fontColor`를 커스텀 할 수 있습니다.
+You can customize the `barColor`, `fontColor`.
+
 # Sample 
 
 ![image](/assets/images/sleep_data_chart.png)
@@ -21,19 +24,18 @@ void main() {
 
 class MyApp extends StatelessWidget {
 
-  /// 수면 그래프 테스트 데이터
-  ///
-  /// 기상 시간
-  final List<double> dataWakeUpTime = [8, 10, 11, 8];
-  /// 수면량
-  final List<double> dataAmount = [8, 9, 7, 5];
-  /// 날짜
+  /// Sample data
+  final List<double> dataWakeUpTime = [8.4, 10.9, 11.4, 8.2];
+  /// 
+  final List<double> dataAmount = [8.5, 9.2, 7.4, 5.5];
+  /// 
   final List<String> labels = [
-    "10/1",
-    "10/2",
-    "10/3",
-    "10/4",
+    "Mon",
+    "Tue",
+    "Wed",
+    "Thu",
   ];
+  
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
