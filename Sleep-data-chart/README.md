@@ -3,6 +3,8 @@
 - 하루 단위로 수면을 언제 시작해서 끝났는지 보여주는 차트입니다.  
 This is chart that show sleep data per day.
 
+- 기상시간과 수면량이 있으면 차트를 그릴 수 있습니다.
+
 - [이곳](https://software-creator.tistory.com/23)에서 bar chart코드를 이용하여 제작했습니다. 
 
 - `barColor`, `fontColor`를 커스텀 할 수 있습니다.  
