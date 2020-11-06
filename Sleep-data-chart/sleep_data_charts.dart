@@ -10,7 +10,7 @@ class OffsetRange {
   OffsetRange(this.dx, this.top, this.bottom);
 }
 
-/// 이 코드는 1시 ~ 24시 로 흐르는 시간의 흐름을 유념하여야 한다.
+// 이 코드는 1시 ~ 24시로 흐르는 시간의 흐름을 유념하여야 한다.
 class SleepDataChart extends CustomPainter {
 
   Color barColor;
@@ -32,7 +32,7 @@ class SleepDataChart extends CustomPainter {
     this.dataAmount,
     this.labels,
     this.barColor = Colors.blue,
-    this.fontColor = Colors.white54,
+    this.fontColor = Colors.white38,
   }) {
     assert(dataWakeUpTime.length == dataAmount.length);
     assert(dataAmount.length == labels.length);
@@ -47,14 +47,14 @@ class SleepDataChart extends CustomPainter {
     drawXLabels(canvas, size, coordinates);
     drawYLabels(canvas, size, coordinates);
     drawBar(canvas, size, coordinates);
-    drawBoxLines(canvas, size, coordinates);
+    //drawBoxLines(canvas, size, coordinates);
   }
 
   void setMarginAndPadding(Size size) {
     barWidth = (size.width * 0.09);
     bottomMargin = size.height / 10; // 세로 크기의 1/10만큼만 텍스트 공간을 줌
     leftMargin = size.width / 10; // 가로 길이의 1/10만큼 텍스트 공간을 줌
-    /// 바의 위치를 가운데로 정렬하기 위한 [padding]
+    // 바의 위치를 가운데로 정렬하기 위한 [padding]
     padding = (size.width - leftMargin) / (labels.length+1) - barWidth/2;
   }
 
@@ -71,9 +71,8 @@ class SleepDataChart extends CustomPainter {
       double top = offset.top;
       double bottom = offset.bottom; // 텍스트 크기만큼 패딩을 빼줘서, 텍스트와 겹치지 않게 함.
 
-      Rect rect = Rect.fromLTRB(right, top, left, bottom);
-      canvas.drawRect(rect, paint);
-
+      RRect rect = RRect.fromLTRBR(right, top, left, bottom, Radius.circular(8.0));
+      canvas.drawRRect(rect, paint,);
     }
   }
 
@@ -88,13 +87,13 @@ class SleepDataChart extends CustomPainter {
 
     for (int index = 0; index < labels.length; index++) {
       TextSpan span = TextSpan(
+        text: labels[index],
         style: TextStyle(
           color: fontColor,
           fontSize: 14,
           fontFamily: 'Roboto',
-          fontWeight: FontWeight.w400,
+          fontWeight: FontWeight.w500,
         ),
-        text: labels[index],
       );
 
       TextPainter tp = TextPainter(
@@ -106,12 +105,8 @@ class SleepDataChart extends CustomPainter {
 
       OffsetRange offset = coordinates[index];
 
-      /// 언어별 텍스트 정렬에 필요한 값
-      /// English => 13
-      /// Korean  =>  6
-      double languagePadding = 13;
-      /// 날짜의 길이에 따라 위치를 다르게 한다.
-      double dx = offset.dx + padding + barWidth/2 - languagePadding;
+      // 날짜의 길이에 따라 위치를 다르게 한다.
+      double dx = offset.dx + padding + barWidth/2-6;
       double dy = size.height - tp.height;
 
       tp.paint(canvas, Offset(dx, dy));
@@ -139,14 +134,14 @@ class SleepDataChart extends CustomPainter {
     return dataWakeUpTime[index].ceilToDouble() == dataWakeUpTime[index];
   }
 
-  /// pivot 에서 duration 만큼 뒤로 시간이 흐르면 나오는 시간
+  // pivot 에서 duration 만큼 뒤로 시간이 흐르면 나오는 시간
   _getClockDiff(var pivot, var duration) {
     var ret=pivot-duration;
     return ret + (ret<0 ? 24 : 0);
   }
 
   String convert12StringFormat(int hours) {
-    return (hours==0 || hours==12 ? 12 : hours%12 ).toString() + (hours~/12 > 0 ? ' PM' : ' AM');
+    return (hours==0 || hours==12 ? 12 : hours%12 ).toString() + (hours~/12 > 0 ? ' pm' : ' am');
   }
 
   // Y축 텍스트(레이블)을 그림. 최저값과 최고값을 Y축에 표시함.
@@ -159,7 +154,7 @@ class SleepDataChart extends CustomPainter {
 
     for (int index = 0; index < coordinates.length; index++) {
       double bottom = coordinates[index].bottom;
-      /// y 축에서 가장 멀리 떨어져야 제일 아래에 위치한다.
+      // y 축에서 가장 멀리 떨어져야 제일 아래에 위치한다.
       if (bottomY < bottom) {
         bottomY = bottom;
         indexOfMin = index;
@@ -167,34 +162,34 @@ class SleepDataChart extends CustomPainter {
     }
     bottomY = size.height - bottomMargin;
 
-    /// 가장 위에 다다른 바의 위쪽 부분 시간을 구한다.
-    /// 아래 위치(기상시간)에 수면량만큼 뒤로 시간을 보내 구한다.
+    // 가장 위에 다다른 바의 위쪽 부분 시간을 구한다.
+    // 아래 위치(기상시간)에 수면량만큼 뒤로 시간을 보내 구한다.
     int topTime=_getClockDiff(dataWakeUpTime[indexOfMax],dataAmount[indexOfMax]).toInt();
-    /// 가장 아래에 있는 바의 시간(기상 시간)을 구한다.
-    /// 만약 기상 시간이 정각이 아니면 1시간을 더한다.
+    // 가장 아래에 있는 바의 시간(기상 시간)을 구한다.
+    // 만약 기상 시간이 정각이 아니면 1시간을 더한다.
     int bottomTime=dataWakeUpTime[indexOfMin].toInt() + (_lowestBarIsDotClock(indexOfMin) ? 0 : 1);
 
-    double fontSize = 16;// calculateFontSize(maxValue, size, xAxis: false);
+    double fontSize = 13;// calculateFontSize(maxValue, size, xAxis: false);
 
     int indexSize=_getClockDiff(bottomTime,topTime);
     double gabY=(bottomY-topY)/(indexSize);
 
     int time = topTime;
     double posY = topY;
-    /// 2칸 간격으로 좌측 레이블 표시
+    // 2칸 간격으로 좌측 레이블 표시
     while(true) {
       if(time >= 24)
         time %= 24;
-      /// 맨 위부터 2시간 단위로 시간을 그린다.
+
+      // 맨 위부터 2시간 단위로 시간을 그린다.
       if(time % 2 == topTime % 2)
         drawYText(canvas, convert12StringFormat(time), fontSize, posY);
+      // 선을 그린다.
+      drawHorizontalLine(canvas, size, coordinates, posY);
 
-      /// 맨 아래에 도달한 경우 점선을 그리지 않고 탈출
+      // 맨 아래에 도달한 경우
       if(time == bottomTime)
         break;
-
-      /// 점선을 그린다.
-      drawHorizontalLine(canvas, size, coordinates, posY);
 
       time+=1;
       posY += gabY;
@@ -222,17 +217,15 @@ class SleepDataChart extends CustomPainter {
       ..strokeWidth = 0.5;
 
     double startX=coordinates[0].dx;
-    double dashWidth=5.0, dashSpace = 9.0;
-    Path path = Path();
-    path.moveTo(startX, dy);
+    canvas.drawLine(Offset(startX,dy), Offset(size.width, dy), paint);
 
-    path.lineTo(size.width, dy);
-    while (startX < size.width) {
-      canvas.drawLine(Offset(startX, dy), Offset(startX + dashSpace-dashWidth, dy), paint);
-      startX += dashSpace;
-    }
-
-    canvas.drawPath(path, paint);
+    // 점선 코드
+    //double dashWidth=5.0, dashSpace = 9.0;
+    //while (startX < size.width) {
+    //  canvas.drawLine(Offset(startX, dy), Offset(startX + dashSpace-dashWidth, dy), paint);
+    //  startX += dashSpace;
+    //}
+    //
   }
 
   // x축과 y축을 구분하는 선을 긋습니다.
@@ -258,19 +251,21 @@ class SleepDataChart extends CustomPainter {
   void drawYText(Canvas canvas, String text, double fontSize, double y) {
 
     TextSpan span = TextSpan(
-      style: TextStyle(
-          fontSize: fontSize,
-          color: fontColor,
-          fontFamily: 'Roboto',
-          fontWeight: FontWeight.w400),
       text: text,
+      style: TextStyle(
+        fontSize: fontSize,
+        color: fontColor,
+        fontFamily: 'Roboto',
+        fontWeight: FontWeight.w500,
+      ),
     );
 
     TextPainter tp = TextPainter(text: span, textDirection: TextDirection.ltr);
 
     tp.layout();
-    double x=(text.length*-8).toDouble() + 8.0;
-
+    // 문자열을 라인에 맞춰 정렬한다.
+    double x=(text.length*-7).toDouble() + 19.0;
+    // 마찬가지로 문자열을 라인에 맞춰 정렬한다.
     Offset offset = Offset(x, y - fontSize/2);
     tp.paint(canvas, offset);
   }
@@ -283,21 +278,21 @@ class SleepDataChart extends CustomPainter {
     double width = size.width - leftMargin;
     double intervalOfBars = width / (dataWakeUpTime.length+1);
 
-    /// 제일 아래에 붙은 바가 정각이 아닌 경우 올려 바를 그린다.
+    // 제일 아래에 붙은 바가 정각이 아닌 경우 올려 바를 그린다.
     int lowestBottom=dataWakeUpTime.reduce(max).ceil();
 
-    /// 가장 위에 도달한 바의 아래 빈 공간 부분과 바의 높이를 더한다.
-    /// 이 값은 정규화시 기준값이 된다.
-    /// 이 역시 정각이 아니면 올림한다.
+    // 가장 위에 도달한 바의 아래 빈 공간 부분과 바의 높이를 더한다.
+    // 이 값은 정규화시 기준값이 된다.
+    // 이 역시 정각이 아니면 올림한다.
     int pivotTop = ((lowestBottom - dataWakeUpTime[maxIdx]) + dataAmount[maxIdx]).ceil();
 
     //print(pivot);
     for (var index = 0; index < dataWakeUpTime.length; index++) {
       double left = intervalOfBars*(index) + leftMargin; // 그래프의 가로 위치를 정합니다.
-      /// 좌측 라벨이 아래로 갈수록 시간이 흐르는 것을 표현하기 위해
-      /// 큰 시간 값과 현재 시간의 차를 구한다.
+      // 좌측 라벨이 아래로 갈수록 시간이 흐르는 것을 표현하기 위해
+      // 큰 시간 값과 현재 시간의 차를 구한다.
       double normalizedBottom = (lowestBottom - dataWakeUpTime[index]) / pivotTop; // 그래프의 높이가 [0~1] 사이가 되도록 정규화 합니다.
-      /// [normalizedBottom] 에서 [gap]칸 만큼 위로 올린다.
+      // [normalizedBottom] 에서 [gap]칸 만큼 위로 올린다.
       double normalizedTop = normalizedBottom + (dataAmount[index]) / pivotTop;
 
       double height = size.height - bottomMargin; // x축에 표시되는 글자들과 겹치지 않게 높이에서 패딩을 제외합니다.
