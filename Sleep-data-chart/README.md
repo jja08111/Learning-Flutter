@@ -10,7 +10,7 @@ This is chart that show sleep data per day.
 - `barColor`, `tooltipDuration` 그리고 전체 그래프의 크기를 커스텀 할 수 있습니다.  
 You can customize the `barColor`, `tooltipDuration` and size of graph.
 
-- 필요시 데이터 생성 예제 코드를 보며 데이터를 생상하기 바랍니다. 
+- 필요시 데이터 생성 [예제 코드](https://github.com/jja08111/Learning-Flutter/blob/main/Sleep-data-chart/sample_read_data.dart)를 보며 데이터를 생상하기 바랍니다. 
 
 # Sample 
 
