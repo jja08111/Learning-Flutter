@@ -7,12 +7,14 @@ This is chart that show sleep data per day.
 
 - [이곳](https://software-creator.tistory.com/23)에서 bar chart코드를 이용하여 제작했습니다. 
 
-- `barColor`, `fontColor`를 커스텀 할 수 있습니다.  
-You can customize the `barColor`, `fontColor`.
+- `barColor`, `tooltipDuration` 그리고 전체 그래프의 크기를 커스텀 할 수 있습니다.  
+You can customize the `barColor`, `tooltipDuration` and size of graph.
+
+- 필요시 데이터 생성 예제 코드를 보며 데이터를 생상하기 바랍니다. 
 
 # Sample 
 
-![image](/assets/images/sleep_data_chart.png)
+![image](/assets/images/sleep_data_chart.gif)
 
 # Example
 
@@ -59,3 +61,13 @@ class MyApp extends StatelessWidget {
   }
 }
 ```
+
+# update 
+
+## 0.0.1
+- 업로드 
+
+## 0.1.1 
+- 바를 길게 터치(onLongPressed)하면 수면량을 보이는 툴팁기능 추가 
+- 하루에 수면량을 표시하는 바를 2개 이상 추가 가능  
+날짜가 겹치면 동일한 x축에 표시 
