@@ -17,7 +17,9 @@ class SleepDataChart extends StatefulWidget {
     @required this.dataAmount,
     @required this.labels,
     this.tooltipDuration = const Duration(seconds: 3),
-  });
+    this.cuttingHour,
+  }) : assert(dataAmount.length == dataWakeUpTime.length),
+        assert(dataWakeUpTime.length == labels.length);
 
   /// 그래프의 너비
   final double width;
@@ -39,6 +41,9 @@ class SleepDataChart extends StatefulWidget {
 
   /// 그래프 클릭시 나오는 툴팁의 지속시간
   final Duration tooltipDuration;
+
+  /// 그래프의 최상단을 설정하는 기준값
+  final int cuttingHour;
 
   @override
   _SleepDataChartState createState() => _SleepDataChartState();
@@ -135,6 +140,7 @@ class _SleepDataChartState extends State<SleepDataChart> with TickerProviderStat
             dataAmount: widget.dataAmount,
             labels: widget.labels,
             barColor: widget.barColor,
+            cuttingHour: widget.cuttingHour,
           ),
         ),
       ),
