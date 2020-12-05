@@ -26,7 +26,7 @@ You can customize the `barColor`, `tooltipDuration` and size of graph.
 - 하루에 수면량을 표시하는 바를 2개 이상 추가 가능  
 날짜가 겹치면 동일한 x축에 표시 
 
-# 0.1.2 
+## 0.1.2 
 - `cuttingHour`를 이용하여 기준이 되는 시간을 설정할 수 있다.  
   기준이 되는 시간은 어느 시간을 그래프의 최상단으로 할지 정하는 값이다.  
   초기 값은 `17`이다.  
