@@ -153,12 +153,12 @@ class ChartPainter extends CustomPainter {
   /// [cuttingHour]을 기준으로 아래쪽에 배치하였을때 바의 상단 부분 위치를 반환
   /// 작을 수록 가장 위에 위치한 값으로 여겨야 한다.
   _getTopPosition(double bottom, double amount) {
-    return _convertUsingCuttingHour((24.0-bottom)+amount);
+    return _convertUsingCuttingHour(bottom-amount);
   }
 
   _getTopIndex() {
     int topIdx = 0;
-    double topPos = 0.0;
+    double topPos = 1000.0;
     for(int i = 0; i < dataAmount.length; ++i) {
       double candidate = _getTopPosition(dataWakeUpTime[i], dataAmount[i]);
       // cuttingHour 을 기준으로 아래쪽에 가장 가까이 위치한 값이 top 이 된다.
@@ -323,11 +323,12 @@ class ChartPainter extends CustomPainter {
 
     // 제일 아래에 붙은 바가 정각이 아닌 경우 올려 바를 그린다.
     int pivotBottom = _convertUsingCuttingHour(dataWakeUpTime[minIdx]).ceil();
-
     // 가장 위에 도달한 바의 아래 빈 공간 부분과 바의 높이를 더한다.
-    // 이 값은 정규화시 기준값이 된다.
-    // 이 역시 정각이 아니면 올림한다.
-    int pivotTop = ((pivotBottom - dataWakeUpTime[maxIdx]) + dataAmount[maxIdx]).ceil();
+    // 즉 가장 높은 바의 상단부 높이를 구한다.
+    // 이 값은 정규화시 기준값이 된다. 이 역시 정각이 아니면 올림한다.
+    int pivotHeight = (pivotBottom - _convertUsingCuttingHour(dataWakeUpTime[maxIdx])
+        + dataAmount[maxIdx]).ceil();
+
     final int length = dataWakeUpTime.length;
     int xIndexCount = 0;
     for (var index = 0; index < length; index++) {
@@ -339,9 +340,9 @@ class ChartPainter extends CustomPainter {
       // 좌측 라벨이 아래로 갈수록 시간이 흐르는 것을 표현하기 위해
       // 큰 시간 값과 현재 시간의 차를 구한다.
       double normalizedBottom = (pivotBottom -
-          _convertUsingCuttingHour(dataWakeUpTime[index])) / pivotTop; // 그래프의 높이가 [0~1] 사이가 되도록 정규화 합니다.
+          _convertUsingCuttingHour(dataWakeUpTime[index])) / pivotHeight; // 그래프의 높이가 [0~1] 사이가 되도록 정규화 합니다.
       // [normalizedBottom] 에서 [gap]칸 만큼 위로 올린다.
-      double normalizedTop = normalizedBottom + (dataAmount[index]) / pivotTop;
+      double normalizedTop = normalizedBottom + (dataAmount[index]) / pivotHeight;
 
       double height = size.height - bottomMargin; // x축에 표시되는 글자들과 겹치지 않게 높이에서 패딩을 제외합니다.
       double bottom = height - normalizedBottom * height; // 정규화된 값을 통해 높이를 구해줍니다.
