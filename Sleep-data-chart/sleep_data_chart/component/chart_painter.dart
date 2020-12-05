@@ -25,6 +25,8 @@ class ChartPainter extends CustomPainter {
   final Color fontColor;
   final double textScaleFactorXAxis = 1.0; // x축 텍스트의 비율을 정함.
   final double textScaleFactorYAxis = 1.2; // y축 텍스트의 비율을 정함.
+  /// make chart using this pivot value
+  final int cuttingHour;
 
   List<double> dataWakeUpTime = [];
   List<double> dataAmount = [];
@@ -42,6 +44,7 @@ class ChartPainter extends CustomPainter {
     @required this.dataWakeUpTime,
     @required this.dataAmount,
     @required this.labels,
+    this.cuttingHour = 17,
     this.barColor = Colors.blue,
     this.fontColor = Colors.white38,
   }) {
@@ -60,6 +63,14 @@ class ChartPainter extends CustomPainter {
     drawYLabels(canvas, size, coordinates);
     drawBar(canvas, size, coordinates);
     //drawBoxLines(canvas, size, coordinates);
+  }
+
+  /// 기준 시간을 이용하여 시간을 변환한다.
+  /// 기준 시간을 기준으로 시간을 아래로 나열된다.
+  ///
+  /// 예를 들어 17시가 기준이라고 할 때 3시가 입력으로 들어오면 27이 반환된다.
+  _convertUsingCuttingHour(var value) {
+    return value + (value < cuttingHour ? 24.0 : 0);
   }
 
   void setMarginAndPadding(Size size) {
@@ -139,24 +150,41 @@ class ChartPainter extends CustomPainter {
     }
   }
 
+  /// [cuttingHour]을 기준으로 아래쪽에 배치하였을때 바의 상단 부분 위치를 반환
+  /// 작을 수록 가장 위에 위치한 값으로 여겨야 한다.
   _getTopPosition(double bottom, double amount) {
-    return (24.0-bottom)+amount;
+    return _convertUsingCuttingHour((24.0-bottom)+amount);
   }
 
   _getTopIndex() {
     int topIdx = 0;
-    double top = 0.0;
+    double topPos = 0.0;
     for(int i = 0; i < dataAmount.length; ++i) {
       double candidate = _getTopPosition(dataWakeUpTime[i], dataAmount[i]);
-      if(top < candidate) {
-        top = candidate;
+      // cuttingHour 을 기준으로 아래쪽에 가장 가까이 위치한 값이 top 이 된다.
+      if(topPos > candidate) {
+        topPos = candidate;
         topIdx = i;
       }
     }
     return topIdx;
   }
 
-  bool _lowestBarIsDotClock(int index) {
+  _getBottomIndex() {
+    int bottomIdx = 0;
+    double bottomPos = 0.0;
+    for(int i = 0; i < dataAmount.length; ++i) {
+      double candidate = _convertUsingCuttingHour(dataWakeUpTime[i]);
+      // cuttingHour 을 기준으로 아래쪽에 가장 멀리 위치한 값이다.
+      if(bottomPos < candidate) {
+        bottomPos = candidate;
+        bottomIdx = i;
+      }
+    }
+    return bottomIdx;
+  }
+
+  bool _isLowestBarDotClock(int index) {
     return dataWakeUpTime[index].ceilToDouble() == dataWakeUpTime[index];
   }
 
@@ -193,8 +221,7 @@ class ChartPainter extends CustomPainter {
     int topTime=_getClockDiff(dataWakeUpTime[indexOfMax],dataAmount[indexOfMax]).toInt();
     // 가장 아래에 있는 바의 시간(기상 시간)을 구한다.
     // 만약 기상 시간이 정각이 아니면 1시간을 더한다.
-    int bottomTime=dataWakeUpTime[indexOfMin].toInt() + (_lowestBarIsDotClock(indexOfMin) ? 0 : 1);
-
+    int bottomTime=dataWakeUpTime[indexOfMin].toInt() + (_isLowestBarDotClock(indexOfMin) ? 0 : 1);
     double fontSize = 13;// calculateFontSize(maxValue, size, xAxis: false);
 
     int indexSize=_getClockDiff(bottomTime,topTime);
@@ -202,11 +229,11 @@ class ChartPainter extends CustomPainter {
 
     int time = topTime;
     double posY = topY;
+
     // 2칸 간격으로 좌측 레이블 표시
     while(true) {
       if(time >= 24)
         time %= 24;
-
       // 맨 위부터 2시간 단위로 시간을 그린다.
       if(time % 2 == topTime % 2)
         drawYText(canvas, convert12StringFormat(time), fontSize, posY);
@@ -214,8 +241,8 @@ class ChartPainter extends CustomPainter {
       drawHorizontalLine(canvas, size, coordinates, posY);
 
       // 맨 아래에 도달한 경우
-      if(time == bottomTime)
-        break;
+      if(time == bottomTime % 24)
+          break;
 
       time+=1;
       posY += gabY;
@@ -287,18 +314,20 @@ class ChartPainter extends CustomPainter {
   List<OffsetRange> getCoordinates(Size size) {
     List<OffsetRange> coordinates = [];
 
+    // 제일 상단에 도달한 바의 인덱스를 얻는다.
     int maxIdx=_getTopIndex();
+    int minIdx=_getBottomIndex();
 
     double width = size.width - leftMargin;
     double intervalOfBars = width / getIndexSizeOfHorizontal();
 
     // 제일 아래에 붙은 바가 정각이 아닌 경우 올려 바를 그린다.
-    int lowestBottom=dataWakeUpTime.reduce(max).ceil();
+    int pivotBottom = _convertUsingCuttingHour(dataWakeUpTime[minIdx]).ceil();
 
     // 가장 위에 도달한 바의 아래 빈 공간 부분과 바의 높이를 더한다.
     // 이 값은 정규화시 기준값이 된다.
     // 이 역시 정각이 아니면 올림한다.
-    int pivotTop = ((lowestBottom - dataWakeUpTime[maxIdx]) + dataAmount[maxIdx]).ceil();
+    int pivotTop = ((pivotBottom - dataWakeUpTime[maxIdx]) + dataAmount[maxIdx]).ceil();
     final int length = dataWakeUpTime.length;
     int xIndexCount = 0;
     for (var index = 0; index < length; index++) {
@@ -309,7 +338,8 @@ class ChartPainter extends CustomPainter {
         ++xIndexCount;
       // 좌측 라벨이 아래로 갈수록 시간이 흐르는 것을 표현하기 위해
       // 큰 시간 값과 현재 시간의 차를 구한다.
-      double normalizedBottom = (lowestBottom - dataWakeUpTime[index]) / pivotTop; // 그래프의 높이가 [0~1] 사이가 되도록 정규화 합니다.
+      double normalizedBottom = (pivotBottom -
+          _convertUsingCuttingHour(dataWakeUpTime[index])) / pivotTop; // 그래프의 높이가 [0~1] 사이가 되도록 정규화 합니다.
       // [normalizedBottom] 에서 [gap]칸 만큼 위로 올린다.
       double normalizedTop = normalizedBottom + (dataAmount[index]) / pivotTop;
 
