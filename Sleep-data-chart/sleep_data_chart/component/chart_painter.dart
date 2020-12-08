@@ -26,7 +26,7 @@ class ChartPainter extends CustomPainter {
   final double textScaleFactorXAxis = 1.0; // x축 텍스트의 비율을 정함.
   final double textScaleFactorYAxis = 1.2; // y축 텍스트의 비율을 정함.
   /// make chart using this pivot value
-  final int cuttingHour;
+  final int topHour;
 
   List<double> dataWakeUpTime = [];
   List<double> dataAmount = [];
@@ -44,7 +44,7 @@ class ChartPainter extends CustomPainter {
     @required this.dataWakeUpTime,
     @required this.dataAmount,
     @required this.labels,
-    this.cuttingHour = 17,
+    this.topHour = 17,
     this.barColor = Colors.blue,
     this.fontColor = Colors.white38,
   }) {
@@ -70,7 +70,7 @@ class ChartPainter extends CustomPainter {
   ///
   /// 예를 들어 17시가 기준이라고 할 때 3시가 입력으로 들어오면 27이 반환된다.
   _convertUsingCuttingHour(var value) {
-    return value + (value < cuttingHour ? 24.0 : 0);
+    return value + (value < topHour ? 24.0 : 0);
   }
 
   void setMarginAndPadding(Size size) {
@@ -150,7 +150,7 @@ class ChartPainter extends CustomPainter {
     }
   }
 
-  /// [cuttingHour]을 기준으로 아래쪽에 배치하였을때 바의 상단 부분 위치를 반환
+  /// [topHour]을 기준으로 아래쪽에 배치하였을때 바의 상단 부분 위치를 반환
   /// 작을 수록 가장 위에 위치한 값으로 여겨야 한다.
   _getTopPosition(double bottom, double amount) {
     return _convertUsingCuttingHour(bottom-amount);
@@ -181,6 +181,7 @@ class ChartPainter extends CustomPainter {
         bottomIdx = i;
       }
     }
+
     return bottomIdx;
   }
 
