@@ -32,3 +32,7 @@ You can customize the `barColor`, `tooltipDuration` and size of graph.
   초기 값은 `17`이다.  
   Add 'cuttingHour' value that determines which time(hour) is the top of the graph.  
   Default value is 17.
+
+## 0.1.3
+- `cuttingHour`을 `topHour`로 이름 변경 
+- 자동으로 `topHour`을 계산해주도록 변경
