@@ -19,8 +19,7 @@ class SleepDataChart extends StatefulWidget {
     this.tooltipDuration = const Duration(seconds: 3),
     this.topHour,
   }) : assert(dataAmount.length == dataWakeUpTime.length),
-        assert(dataWakeUpTime.length == labels.length),
-        assert(dataAmount.contains(0.0) == false);
+        assert(dataWakeUpTime.length == labels.length);
 
   /// 그래프의 너비
   final double width;
@@ -35,6 +34,8 @@ class SleepDataChart extends StatefulWidget {
   final List<double> dataWakeUpTime;
 
   /// 수면량 리스트
+  ///
+  /// 0인 값을 이용하여 해당 요일이 비어있음을 표시할 수 있다.
   final List<double> dataAmount;
 
   /// 그래프 x축 방향 레이블
@@ -76,6 +77,7 @@ class _SleepDataChartState extends State<SleepDataChart> with TickerProviderStat
     // Listen to global pointer events so that we can hide a tooltip immediately
     // if some other control is clicked on.
     GestureBinding.instance.pointerRouter.addGlobalRoute(_handlePointerEvent);
+    _processDataAmountList();
   }
 
   /// a에서 b로 흐른 시간을 구하거나, a에서 b만큼 이전으로 흐른 시간을 구한다.
@@ -93,6 +95,27 @@ class _SleepDataChartState extends State<SleepDataChart> with TickerProviderStat
     return _getHourDiff(a, b) > 12 ? true : false;
   }
 
+  /// 빈 데이터인 경우의 bar 위치를 적절하게 생성한다.
+  double _getEmptyHourPosition() {
+    int idx = 0;
+    for(int i=0;i<widget.dataAmount.length;++i) {
+      if(widget.dataAmount[i] > 0) {
+        idx = i;
+        break;
+      }
+    }
+    return widget.dataWakeUpTime[idx];
+  }
+
+  void _processDataAmountList() {
+    final emptyHourPosition = _getEmptyHourPosition();
+    for(int i=0;i<widget.dataAmount.length;++i) {
+      if(widget.dataAmount[i] == 0) {
+        widget.dataWakeUpTime[i] = emptyHourPosition;
+      }
+    }
+  }
+
   int get _topHour {
     final length = widget.dataWakeUpTime.length;
     int resultIdx = 0;
@@ -103,12 +126,10 @@ class _SleepDataChartState extends State<SleepDataChart> with TickerProviderStat
       // 동일한 요일 데이터일때 간격이 제일 넓은 구간의 아래 부분 기상값 중
       // 제일 빠른 기상 값을 가진 요일의 데이터가 기준이 된다.
       double maxInterval = 0.0;
-
       // 같은 요일 데이터 중 간격이 제일 넓은 부분의 아래 데이터를 찾는다.
       while(true) {
         final int lo = i;
         final int hi = (i + 1) % length;
-
         // 요일이 다른 경우
         if(widget.labels[lo] != widget.labels[hi]) {
           double candidateDiff = _getHourDiff(
@@ -119,17 +140,14 @@ class _SleepDataChartState extends State<SleepDataChart> with TickerProviderStat
           }
           break;
         }
-
         double candidateDiff = _getHourDiff(
             _getHourDiff(widget.dataWakeUpTime[hi], widget.dataAmount[hi]), widget.dataWakeUpTime[lo]);
-
         if(maxInterval < candidateDiff) {
           maxInterval = candidateDiff;
           idx = hi;
         }
         ++i;
       }
-
       // 기상 시간이 더 빠른 것을 이용한다.
       if(_compareHours(
           _getHourDiff(widget.dataWakeUpTime[idx], widget.dataAmount[idx]),
@@ -138,7 +156,6 @@ class _SleepDataChartState extends State<SleepDataChart> with TickerProviderStat
         resultIdx = idx;
       }
     }
-
     return _getHourDiff(widget.dataWakeUpTime[resultIdx], widget.dataAmount[resultIdx]).floor();
   }
 
