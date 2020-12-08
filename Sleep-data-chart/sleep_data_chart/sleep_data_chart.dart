@@ -127,7 +127,7 @@ class _SleepDataChartState extends State<SleepDataChart> with TickerProviderStat
       // 제일 빠른 기상 값을 가진 요일의 데이터가 기준이 된다.
       double maxInterval = 0.0;
       // 같은 요일 데이터 중 간격이 제일 넓은 부분의 아래 데이터를 찾는다.
-      while(true) {
+      while(i < length) {
         final int lo = i;
         final int hi = (i + 1) % length;
         // 요일이 다른 경우
