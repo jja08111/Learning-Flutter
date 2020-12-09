@@ -36,3 +36,7 @@ You can customize the `barColor`, `tooltipDuration` and size of graph.
 ## 0.1.3
 - `cuttingHour`을 `topHour`로 이름 변경 
 - 자동으로 `topHour`을 계산해주도록 변경
+
+## 0.1.4
+- 수면량에 `0`을 넣는 경우 빈 데이터를 표시할 수 있도록 기능 추가
+- 배열 인덱스 참조 오류 해결
