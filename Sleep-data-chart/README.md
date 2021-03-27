@@ -1,4 +1,4 @@
-# time_chart is released!!
+# time_chart was released!!
 Please use [time_chart](https://pub.dev/packages/time_chart) instead of this.
 
 # Sleep data chart
